@@ -25,4 +25,9 @@ public class CustomerController {
     Customer customer = customerService.createCustomer(createCustomerRequest.getName(), createCustomerRequest.getCreditLimit());
     return new CreateCustomerResponse(customer.getId());
   }
+
+  @RequestMapping(value = "/export-snapshots", method = RequestMethod.POST)
+  public void exportSnapshots() {
+    customerService.exportSnapshots();
+  }
 }

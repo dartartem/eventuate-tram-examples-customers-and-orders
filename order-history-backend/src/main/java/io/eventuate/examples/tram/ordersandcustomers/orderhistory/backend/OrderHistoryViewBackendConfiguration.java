@@ -34,11 +34,11 @@ public class OrderHistoryViewBackendConfiguration {
     return new CustomerHistoryEventConsumer();
   }
 
-  @Bean("customerHistoryDomainEventDispatcher")
-  public DomainEventDispatcher customerHistoryDomainEventDispatcher(CustomerHistoryEventConsumer customerHistoryEventConsumer,
-                                                                    MessageConsumer messageConsumer) {
-
-    return new DomainEventDispatcher("customerHistoryServiceEvents",
-            customerHistoryEventConsumer.domainEventHandlers(), messageConsumer);
-  }
+//  @Bean("customerHistoryDomainEventDispatcher")
+//  public DomainEventDispatcher customerHistoryDomainEventDispatcher(CustomerHistoryEventConsumer customerHistoryEventConsumer,
+//                                                                    MessageConsumer messageConsumer) {
+//
+//    return new DomainEventDispatcher("customerHistoryServiceEvents",
+//            customerHistoryEventConsumer.domainEventHandlers(), messageConsumer);
+//  }
 }
