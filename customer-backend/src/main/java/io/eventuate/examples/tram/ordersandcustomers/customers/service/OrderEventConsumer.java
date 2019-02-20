@@ -37,7 +37,8 @@ public class OrderEventConsumer {
     OrderCreatedEvent orderCreatedEvent = domainEventEnvelope.getEvent();
 
     Customer customer = customerRepository
-            .findOne(orderCreatedEvent.getOrderDetails().getCustomerId());
+            .findById(orderCreatedEvent.getOrderDetails().getCustomerId())
+            .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
 
     try {
       customer.reserveCredit(orderId, orderCreatedEvent.getOrderDetails().getOrderTotal());

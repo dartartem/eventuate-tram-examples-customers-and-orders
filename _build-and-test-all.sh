@@ -7,7 +7,7 @@ set -e
 
 docker-compose -f docker-compose-${DATABASE?}${MODE?}.yml down -v
 
-docker-compose -f docker-compose-${DATABASE?}${MODE?}.yml up -d --build zookeeper ${DATABASE?} kafka
+docker-compose -f docker-compose-${DATABASE?}${MODE?}.yml up -d --build zookeeper ${DATABASE?} ${BROKER}
 
 ./wait-for-${DATABASE?}.sh
 
@@ -17,7 +17,7 @@ docker-compose -f docker-compose-${DATABASE?}${MODE?}.yml up -d --build cdcservi
 
 ./gradlew -x :end-to-end-tests:test build
 
-docker-compose -f docker-compose-${DATABASE?}${MODE?}.yml up -d --build 
+docker-compose -f docker-compose-${DATABASE?}${MODE?}.yml up -d --build mongodb orderservice customerservice orderhistoryservice
 
 ./wait-for-services.sh $DOCKER_HOST_IP "8081 8082 8083"
 

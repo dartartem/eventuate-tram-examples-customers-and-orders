@@ -33,7 +33,7 @@ public class OrderController {
   @RequestMapping(value="/orders/{orderId}", method= RequestMethod.GET)
   public ResponseEntity<GetOrderResponse> getOrder(@PathVariable Long orderId) {
 
-    Order order = orderRepository.findOne(orderId);
+    Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Order does not exist"));
 
     if (order == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);

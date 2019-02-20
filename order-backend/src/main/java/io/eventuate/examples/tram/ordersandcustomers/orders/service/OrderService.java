@@ -30,16 +30,20 @@ public class OrderService {
   }
 
   public void approveOrder(Long orderId) {
-    Order order = orderRepository.findOne(orderId);
+    Order order = findOrder(orderId);
     order.noteCreditReserved();
     domainEventPublisher.publish(Order.class,
             orderId, singletonList(new OrderApprovedEvent(order.getOrderDetails())));
   }
 
   public void rejectOrder(Long orderId) {
-    Order order = orderRepository.findOne(orderId);
+    Order order = findOrder(orderId);
     order.noteCreditReservationFailed();
     domainEventPublisher.publish(Order.class,
             orderId, singletonList(new OrderRejectedEvent(order.getOrderDetails())));
+  }
+
+  public Order findOrder(Long orderId) {
+    return orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Order does not exist"));
   }
 }

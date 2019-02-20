@@ -2,7 +2,6 @@ package io.eventuate.examples.tram.ordersandcustomers.orders;
 
 import io.eventuate.examples.tram.ordersandcustomers.orders.service.CustomerEventConsumer;
 import io.eventuate.examples.tram.ordersandcustomers.orders.service.OrderService;
-import io.eventuate.tram.consumer.kafka.TramConsumerKafkaConfiguration;
 import io.eventuate.tram.events.publisher.TramEventsPublisherConfiguration;
 import io.eventuate.tram.events.subscriber.DomainEventDispatcher;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
@@ -16,10 +15,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Configuration
 @EnableJpaRepositories
 @EnableAutoConfiguration
-@Import({TramConsumerKafkaConfiguration.class,
-        TramEventsPublisherConfiguration.class,
+@Import({TramEventsPublisherConfiguration.class,
         TramMessageProducerJdbcConfiguration.class})
-public class OrderConfiguration {
+public class OrderCommonConfiguration {
 
   @Bean
   public OrderService orderService() {

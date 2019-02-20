@@ -22,7 +22,10 @@ public class CustomerOrderHistoryController {
 
   @RequestMapping(value="/customers/{customerId}", method= RequestMethod.GET)
   public ResponseEntity<CustomerView> getCustomer(@PathVariable Long customerId) {
-    CustomerView customer = customerViewRepository.findOne(customerId);
+    CustomerView customer = customerViewRepository
+            .findById(customerId)
+            .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
+
     System.out.println("Found customer=" + customer + " for " + customerId);
     if (customer == null)
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
