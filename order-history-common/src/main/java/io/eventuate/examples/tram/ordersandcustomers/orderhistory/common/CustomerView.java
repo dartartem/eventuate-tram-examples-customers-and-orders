@@ -2,21 +2,33 @@ package io.eventuate.examples.tram.ordersandcustomers.orderhistory.common;
 
 import io.eventuate.examples.tram.ordersandcustomers.commondomain.Money;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Document
+@RedisHash
 public class CustomerView {
 
   @Id
   private Long id;
 
-
   private Map<Long, OrderInfo> orders = new HashMap<>();
   private String name;
   private Money creditLimit;
+
+  public CustomerView() {
+  }
+
+  public CustomerView(Long id) {
+    this.id = id;
+  }
+
+  public CustomerView(Long id, String name, Money creditLimit) {
+    this.id = id;
+    this.name = name;
+    this.creditLimit = creditLimit;
+  }
 
   public void setId(Long id) {
     this.id = id;

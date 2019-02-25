@@ -1,7 +1,7 @@
 package io.eventuate.examples.tram.ordersandcustomers.orderhistory.backend;
 
 import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.OrderView;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.repository.CrudRepository;
 
-public interface OrderViewRepository extends MongoRepository<OrderView, Long>, OrderViewRepositoryCustom {
+public interface OrderViewRepository extends CrudRepository<OrderView, Long> {
 }

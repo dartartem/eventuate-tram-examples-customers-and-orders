@@ -20,17 +20,12 @@ public class OrderViewController {
     this.orderViewRepository = orderViewRepository;
   }
 
-
   @RequestMapping(value="/orders/{orderId}", method= RequestMethod.GET)
   public ResponseEntity<OrderView> getOrder(@PathVariable Long orderId) {
 
-    OrderView ov = orderViewRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Order does not exist"));
-    if (ov == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } else {
-      return new ResponseEntity<>(ov, HttpStatus.OK);
-    }
+    return orderViewRepository
+            .findById(orderId)
+            .map(orderView -> new ResponseEntity<>(orderView, HttpStatus.OK))
+            .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
   }
-
-
 }

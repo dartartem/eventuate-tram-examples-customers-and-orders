@@ -28,7 +28,7 @@ public class CustomerViewRepositoryIntegrationTest {
     Money creditLimit = new Money(2000);
     String customerName = "Fred";
 
-    customerViewRepository.addCustomer(customerId, customerName, creditLimit);
+    customerViewRepository.save(new CustomerView(customerId, customerName, creditLimit));
     CustomerView customerView = customerViewRepository.findById(customerId).get();
 
     assertEquals(customerId, customerView.getId());

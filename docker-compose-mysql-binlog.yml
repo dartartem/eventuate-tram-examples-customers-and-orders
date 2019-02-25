@@ -51,13 +51,11 @@ services:
     ports:
       - "8083:8080"
     depends_on:
-      - mongodb
       - mysql
       - kafka
       - redis
       - zookeeper
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb/clients_and_orders
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql/eventuate
       SPRING_DATASOURCE_USERNAME: mysqluser
       SPRING_DATASOURCE_PASSWORD: mysqlpw
@@ -96,13 +94,6 @@ services:
       - MYSQL_ROOT_PASSWORD=rootpassword
       - MYSQL_USER=mysqluser
       - MYSQL_PASSWORD=mysqlpw
-
-  mongodb:
-    image: mongo:3.0.4
-    hostname: mongodb
-    command: mongod --smallfiles
-    ports:
-      - "27017:27017"
 
   redis:
     image: redis

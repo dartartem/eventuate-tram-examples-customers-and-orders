@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({OrderHistoryViewMongoConfiguration.class,
+@Import({OrderHistoryViewRedisConfiguration.class,
         TramEventsPublisherConfiguration.class,
         TramMessageProducerJdbcConfiguration.class})
 public class OrderHistoryViewBackendCommonConfiguration {
