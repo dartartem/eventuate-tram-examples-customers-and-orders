@@ -17,10 +17,18 @@ public class OrderView {
   public OrderView() {
   }
 
+  public OrderView(Long id) {
+    this.id = id;
+  }
+
   public OrderView(Long id, Money orderTotal) {
     this.id = id;
     this.orderTotal = orderTotal;
     this.state = OrderState.PENDING;
+  }
+
+  public Long getId() {
+    return id;
   }
 
   public Money getOrderTotal() {

@@ -42,6 +42,14 @@ public class CustomerView {
     return orders;
   }
 
+  public void addOrder(OrderInfo order) {
+    orders.put(order.getOrderId(), order);
+  }
+
+  public void addOrders(Map<Long, OrderInfo> orders) {
+    this.orders.putAll(orders);
+  }
+
   public void setName(String name) {
     this.name = name;
   }
