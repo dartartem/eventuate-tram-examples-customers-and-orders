@@ -10,8 +10,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.PartialUpdate;
-import org.springframework.data.redis.core.RedisKeyValueTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.HashMap;
@@ -27,9 +25,6 @@ public class CustomerViewRepositoryIntegrationTest {
   @Autowired
   private CustomerViewRepository customerViewRepository;
 
-  @Autowired
-  private RedisKeyValueTemplate redisKeyValueTemplate;
-
   @Test
   public void shouldCreateAndFindCustomer() {
 
@@ -37,7 +32,7 @@ public class CustomerViewRepositoryIntegrationTest {
     Money creditLimit = new Money(2000);
     String customerName = "Fred";
 
-    customerViewRepository.save(new CustomerView(customerId, customerName, creditLimit));
+    customerViewRepository.createOrUpdateCustomerView(new CustomerView(customerId, customerName, creditLimit));
     CustomerView customerView = customerViewRepository.findById(customerId).get();
 
     assertEquals(customerId, customerView.getId());
@@ -52,10 +47,10 @@ public class CustomerViewRepositoryIntegrationTest {
 
     Map<Long, OrderInfo> originalOrders = ImmutableMap.of(10L, new OrderInfo(10L, new Money(10)),
             20L, new OrderInfo(20L, new Money(20)));
-    createCustomer(customerId, originalOrders);
+    createOrUpdateCustomerWithOrders(customerId, originalOrders);
 
     Map<Long, OrderInfo> addedOrders = ImmutableMap.of(30L, new OrderInfo(30L, new Money(30)));
-    addOrdersToCustomer(customerId, addedOrders);
+    createOrUpdateCustomerWithOrders(customerId, addedOrders);
 
     Map<Long, OrderInfo> mergedOrders = new HashMap<>();
     mergedOrders.putAll(originalOrders);
@@ -69,23 +64,16 @@ public class CustomerViewRepositoryIntegrationTest {
     Long customerId = System.nanoTime();
 
     Map<Long, OrderInfo> addedOrders = ImmutableMap.of(30L, new OrderInfo(30L, new Money(30)));
-    addOrdersToCustomer(customerId, addedOrders);
+    createOrUpdateCustomerWithOrders(customerId, addedOrders);
 
     assertOrdersAreMerged(customerId, addedOrders);
   }
 
-  private void createCustomer(Long customerId, Map<Long, OrderInfo> orders) {
+  private void createOrUpdateCustomerWithOrders(Long customerId, Map<Long, OrderInfo> orders) {
     CustomerView customerView = new CustomerView();
     customerView.setId(customerId);
     customerView.addOrders(orders);
-    customerViewRepository.save(customerView);
-  }
-
-  private void addOrdersToCustomer(Long customerId, Map<Long, OrderInfo> orders) {
-    CustomerView customerView = new CustomerView();
-    customerView.setId(customerId);
-    customerView.addOrders(orders);
-    redisKeyValueTemplate.update(new PartialUpdate<>(customerId, customerView));
+    customerViewRepository.createOrUpdateCustomerView(customerView);
   }
 
   private void assertOrdersAreMerged(Long customerId, Map<Long, OrderInfo> mergedOrders) {
