@@ -12,6 +12,8 @@ import io.eventuate.tram.events.subscriber.DomainEventHandlers;
 import io.eventuate.tram.events.subscriber.DomainEventHandlersBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import java.util.Collections;
 
 
@@ -22,6 +24,9 @@ public class OrderEventConsumer {
 
   @Autowired
   private DomainEventPublisher domainEventPublisher;
+
+  @Autowired
+  private EntityManager entityManager;
 
   public DomainEventHandlers domainEventHandlers() {
     return DomainEventHandlersBuilder
@@ -39,6 +44,8 @@ public class OrderEventConsumer {
     Customer customer = customerRepository
             .findById(orderCreatedEvent.getOrderDetails().getCustomerId())
             .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
+
+    entityManager.lock(customer, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
     try {
       customer.reserveCredit(orderId, orderCreatedEvent.getOrderDetails().getOrderTotal());
