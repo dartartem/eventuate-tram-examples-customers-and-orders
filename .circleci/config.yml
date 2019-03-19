@@ -18,15 +18,7 @@ jobs:
       - run:
           command: |
             export TERM=dumb
-            ./build-and-test-all-mysql-binlog.sh
-      - run:
-          command: |
-            export TERM=dumb
-            ./build-and-test-all-postgres-polling.sh
-      - run:
-          command: |
-            export TERM=dumb
-            ./build-and-test-all-postgres-wal.sh
+            ./build-and-test-all-mysql-binlog-redis.sh
       - run:
           name: Save test results
           command: |

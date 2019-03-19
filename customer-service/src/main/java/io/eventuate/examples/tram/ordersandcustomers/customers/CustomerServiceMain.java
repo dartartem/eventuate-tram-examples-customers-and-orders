@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@Import({CustomerKafkaConfiguration.class, CustomerRedisConfiguration.class, CustomerWebConfiguration.class})
+@Import({CustomerRedisConfiguration.class, CustomerWebConfiguration.class})
 public class CustomerServiceMain {
   public static void main(String[] args) {
     SpringApplication.run(CustomerServiceMain.class, args);

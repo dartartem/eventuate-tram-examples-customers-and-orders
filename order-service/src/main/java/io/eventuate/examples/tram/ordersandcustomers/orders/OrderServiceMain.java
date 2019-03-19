@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@Import({OrderWebConfiguration.class, OrderKafkaConfiguration.class, OrderRedisConfiguration.class})
+@Import({OrderWebConfiguration.class, OrderRedisConfiguration.class})
 public class OrderServiceMain {
   public static void main(String[] args) {
     SpringApplication.run(OrderServiceMain.class, args);
