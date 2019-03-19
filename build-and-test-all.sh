@@ -42,7 +42,7 @@ docker-compose -f docker-compose.yml up -d --build zookeeper mysql redis
 
 ./wait-for-mysql.sh
 
-docker-compose -f docker-compose.yml up -d --build cdcservice
+docker-compose -f docker-compose.yml up -d --build cdc-service
 
 ./wait-for-services.sh $DOCKER_HOST_IP "8099"
 

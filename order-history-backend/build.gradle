@@ -13,11 +13,9 @@ dependencies {
     compile project(":order-history-common")
 
     compile "io.eventuate.tram.core:eventuate-tram-consumer-redis:$eventuateTramVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-jdbc-kafka:$eventuateTramVersion"
 
     compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
     compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
-    compile "io.eventuate.client.java:eventuate-client-java-spring:$eventuateClientVersion"
 
     testCompile "junit:junit:4.12"
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"

@@ -3,15 +3,12 @@ package io.eventuate.examples.tram.ordersandcustomers.orderhistory.backend;
 import io.eventuate.tram.events.publisher.TramEventsPublisherConfiguration;
 import io.eventuate.tram.events.subscriber.DomainEventDispatcher;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
-import io.eventuate.tram.messaging.producer.jdbc.TramMessageProducerJdbcConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({OrderHistoryViewRedisConfiguration.class,
-        TramEventsPublisherConfiguration.class,
-        TramMessageProducerJdbcConfiguration.class})
+@Import({OrderHistoryViewRedisConfiguration.class})
 public class OrderHistoryViewBackendCommonConfiguration {
 
   @Bean
