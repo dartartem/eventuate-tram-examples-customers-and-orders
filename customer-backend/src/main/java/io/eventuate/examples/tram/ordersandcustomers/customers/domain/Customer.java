@@ -3,6 +3,7 @@ package io.eventuate.examples.tram.ordersandcustomers.customers.domain;
 import io.eventuate.examples.tram.ordersandcustomers.commondomain.CustomerCreatedEvent;
 import io.eventuate.examples.tram.ordersandcustomers.commondomain.Money;
 import io.eventuate.tram.events.ResultWithEvents;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import static java.util.Collections.singletonList;
 @Entity
 @Table(name="Customer")
 @Access(AccessType.FIELD)
+@DynamicUpdate
 public class Customer {
 
   @Id
