@@ -1,3 +1,15 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.spring.io/milestone" }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
+    }
+}
+
+apply plugin: FtgoServicePlugin
+
 dependencies {
     compile project(":common-swagger")
     compile project(":order-backend")
@@ -7,8 +19,6 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
     compile "org.springframework.boot:spring-boot-starter-hateoas:$springBootVersion"
 }
-
-apply plugin: 'org.springframework.boot'
 
 
 
