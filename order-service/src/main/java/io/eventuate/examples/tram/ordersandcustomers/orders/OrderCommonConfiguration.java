@@ -1,6 +1,6 @@
 package io.eventuate.examples.tram.ordersandcustomers.orders;
 
-import io.eventuate.examples.tram.ordersandcustomers.orders.service.CustomerEventConsumer;
+import io.eventuate.examples.tram.ordersandcustomers.orders.service.OrderServiceEventSubscriber;
 import io.eventuate.examples.tram.ordersandcustomers.orders.service.OrderService;
 import io.eventuate.tram.events.publisher.TramEventsPublisherConfiguration;
 import io.eventuate.tram.events.subscriber.DomainEventDispatcher;
@@ -26,12 +26,12 @@ public class OrderCommonConfiguration {
 
 
   @Bean
-  public CustomerEventConsumer orderEventConsumer() {
-    return new CustomerEventConsumer();
+  public OrderServiceEventSubscriber OrderServiceEventSubscriber() {
+    return new OrderServiceEventSubscriber();
   }
 
   @Bean
-  public DomainEventDispatcher domainEventDispatcher(CustomerEventConsumer customerEventConsumer, MessageConsumer messageConsumer) {
-    return new DomainEventDispatcher("consumerServiceEvents", customerEventConsumer.domainEventHandlers(), messageConsumer);
+  public DomainEventDispatcher domainEventDispatcher(OrderServiceEventSubscriber orderServiceEventSubscriber, MessageConsumer messageConsumer) {
+    return new DomainEventDispatcher("orderServiceEventSubscriber", orderServiceEventSubscriber.domainEventHandlers(), messageConsumer);
   }
 }

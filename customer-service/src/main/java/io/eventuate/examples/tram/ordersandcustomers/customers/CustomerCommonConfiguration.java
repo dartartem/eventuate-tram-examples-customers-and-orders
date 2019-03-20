@@ -2,7 +2,7 @@ package io.eventuate.examples.tram.ordersandcustomers.customers;
 
 import io.eventuate.examples.tram.ordersandcustomers.customers.service.CustomerOptimisticLockingDecorator;
 import io.eventuate.examples.tram.ordersandcustomers.customers.service.CustomerService;
-import io.eventuate.examples.tram.ordersandcustomers.customers.service.OrderEventConsumer;
+import io.eventuate.examples.tram.ordersandcustomers.customers.service.CustomerServiceEventSubscriber;
 import io.eventuate.tram.events.publisher.TramEventsPublisherConfiguration;
 import io.eventuate.tram.events.subscriber.DomainEventDispatcher;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
@@ -23,13 +23,13 @@ import org.springframework.retry.annotation.EnableRetry;
 public class CustomerCommonConfiguration {
 
   @Bean
-  public OrderEventConsumer orderEventConsumer() {
-    return new OrderEventConsumer();
+  public CustomerServiceEventSubscriber customerServiceEventSubscriber() {
+    return new CustomerServiceEventSubscriber();
   }
 
   @Bean
-  public DomainEventDispatcher domainEventDispatcher(OrderEventConsumer orderEventConsumer, MessageConsumer messageConsumer) {
-    return new DomainEventDispatcher("orderServiceEvents", orderEventConsumer.domainEventHandlers(), messageConsumer);
+  public DomainEventDispatcher domainEventDispatcher(CustomerServiceEventSubscriber customerServiceEventSubscriber, MessageConsumer messageConsumer) {
+    return new DomainEventDispatcher("customerServiceEventSubscriber", customerServiceEventSubscriber.domainEventHandlers(), messageConsumer);
   }
 
   @Bean

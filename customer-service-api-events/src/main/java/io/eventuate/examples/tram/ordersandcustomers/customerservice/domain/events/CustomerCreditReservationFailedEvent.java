@@ -2,23 +2,14 @@ package io.eventuate.examples.tram.ordersandcustomers.customerservice.domain.eve
 
 import io.eventuate.tram.events.common.DomainEvent;
 
-public class CustomerCreditReservationFailedEvent implements DomainEvent {
-
-  private Long orderId;
+public class CustomerCreditReservationFailedEvent extends AbstractCustomerOrderEvent {
 
   public CustomerCreditReservationFailedEvent() {
   }
 
   public CustomerCreditReservationFailedEvent(Long orderId) {
-    this.orderId = orderId;
-  }
-
-  public Long getOrderId() {
-    return orderId;
+    super(orderId);
   }
 
 
-  public void setOrderId(Long orderId) {
-    this.orderId = orderId;
-  }
 }

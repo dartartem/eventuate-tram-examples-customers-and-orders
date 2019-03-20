@@ -4,11 +4,8 @@ package io.eventuate.examples.tram.ordersandcustomers.orders.domain;
 import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderCreatedEvent;
 import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderDetails;
 import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderState;
-import io.eventuate.tram.events.ResultWithEvents;
 
 import javax.persistence.*;
-
-import static java.util.Collections.singletonList;
 
 @Entity
 @Table(name="orders")
@@ -19,6 +16,7 @@ public class Order {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Enumerated(EnumType.STRING)
   private OrderState state;
 
   @Embedded
@@ -32,10 +30,9 @@ public class Order {
     this.state = OrderState.PENDING;
   }
 
-  public static ResultWithEvents<Order> createOrder(OrderDetails orderDetails) {
+  public static Order createOrder(OrderDetails orderDetails) {
     Order order = new Order(orderDetails);
-    OrderCreatedEvent orderCreatedEvent = new OrderCreatedEvent(orderDetails);
-    return new ResultWithEvents<>(order, singletonList(orderCreatedEvent));
+    return order;
   }
 
   public Long getId() {

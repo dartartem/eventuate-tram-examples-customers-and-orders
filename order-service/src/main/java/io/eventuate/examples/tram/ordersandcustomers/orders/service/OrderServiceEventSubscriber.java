@@ -2,13 +2,14 @@ package io.eventuate.examples.tram.ordersandcustomers.orders.service;
 
 import io.eventuate.examples.tram.ordersandcustomers.customerservice.domain.events.CustomerCreditReservationFailedEvent;
 import io.eventuate.examples.tram.ordersandcustomers.customerservice.domain.events.CustomerCreditReservedEvent;
+import io.eventuate.examples.tram.ordersandcustomers.customerservice.domain.events.CustomerValidationFailedEvent;
 import io.eventuate.tram.events.subscriber.DomainEventEnvelope;
 import io.eventuate.tram.events.subscriber.DomainEventHandlers;
 import io.eventuate.tram.events.subscriber.DomainEventHandlersBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
-public class CustomerEventConsumer {
+public class OrderServiceEventSubscriber {
 
   @Autowired
   private OrderService orderService;
@@ -16,16 +17,21 @@ public class CustomerEventConsumer {
   public DomainEventHandlers domainEventHandlers() {
     return DomainEventHandlersBuilder
             .forAggregateType("io.eventuate.examples.tram.ordersandcustomers.customers.domain.Customer")
-            .onEvent(CustomerCreditReservedEvent.class, this::customerCreditReservedEventHandler)
-            .onEvent(CustomerCreditReservationFailedEvent.class, this::customerCreditReservationFailedEventHandler)
+            .onEvent(CustomerCreditReservedEvent.class, this::handleCustomerCreditReservedEvent)
+            .onEvent(CustomerCreditReservationFailedEvent.class, this::handleCustomerCreditReservationFailedEvent)
+            .onEvent(CustomerValidationFailedEvent.class, this::handleCustomerValidationFailedEvent)
             .build();
   }
 
-  private void customerCreditReservedEventHandler(DomainEventEnvelope<CustomerCreditReservedEvent> domainEventEnvelope) {
+  private void handleCustomerCreditReservedEvent(DomainEventEnvelope<CustomerCreditReservedEvent> domainEventEnvelope) {
     orderService.approveOrder(domainEventEnvelope.getEvent().getOrderId());
   }
 
-  private void customerCreditReservationFailedEventHandler(DomainEventEnvelope<CustomerCreditReservationFailedEvent> domainEventEnvelope) {
+  private void handleCustomerCreditReservationFailedEvent(DomainEventEnvelope<CustomerCreditReservationFailedEvent> domainEventEnvelope) {
+    orderService.rejectOrder(domainEventEnvelope.getEvent().getOrderId());
+  }
+
+  private void handleCustomerValidationFailedEvent(DomainEventEnvelope<CustomerValidationFailedEvent> domainEventEnvelope) {
     orderService.rejectOrder(domainEventEnvelope.getEvent().getOrderId());
   }
 }

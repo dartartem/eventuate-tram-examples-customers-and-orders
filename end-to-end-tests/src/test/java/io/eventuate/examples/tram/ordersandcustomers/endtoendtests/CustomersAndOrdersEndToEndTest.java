@@ -25,7 +25,7 @@ import org.springframework.web.client.RestTemplate;
 public class CustomersAndOrdersEndToEndTest{
 
   @Value("#{systemEnvironment['DOCKER_HOST_IP']}")
-  private String hostName;
+  private String hostName = "localhost";
 
   private String baseUrlOrders(String path) {
     return "http://"+hostName+":8081/" + path;
@@ -52,6 +52,13 @@ public class CustomersAndOrdersEndToEndTest{
   @Test
   public void shouldReject() {
     Long customerId = createCustomer("Fred", new Money("15.00"));
+    Long orderId = createOrder(customerId, new Money("123.34"));
+    assertOrderState(orderId, OrderState.REJECTED);
+  }
+
+  @Test
+  public void shouldRejectForNonExistentCustomerId() {
+    Long customerId = System.nanoTime();
     Long orderId = createOrder(customerId, new Money("123.34"));
     assertOrderState(orderId, OrderState.REJECTED);
   }

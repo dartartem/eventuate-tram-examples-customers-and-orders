@@ -2,6 +2,7 @@ package io.eventuate.examples.tram.ordersandcustomers.customers.service;
 
 import io.eventuate.examples.tram.ordersandcustomers.customerservice.domain.events.CustomerCreditReservationFailedEvent;
 import io.eventuate.examples.tram.ordersandcustomers.customerservice.domain.events.CustomerCreditReservedEvent;
+import io.eventuate.examples.tram.ordersandcustomers.customerservice.domain.events.CustomerValidationFailedEvent;
 import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderCreatedEvent;
 import io.eventuate.examples.tram.ordersandcustomers.customers.domain.Customer;
 import io.eventuate.examples.tram.ordersandcustomers.customers.domain.CustomerCreditLimitExceededException;
@@ -10,23 +11,25 @@ import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.events.subscriber.DomainEventEnvelope;
 import io.eventuate.tram.events.subscriber.DomainEventHandlers;
 import io.eventuate.tram.events.subscriber.DomainEventHandlersBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import java.util.Collections;
+import java.util.Optional;
 
 
-public class OrderEventConsumer {
+public class CustomerServiceEventSubscriber {
+
+  private Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
   private CustomerRepository customerRepository;
 
   @Autowired
   private DomainEventPublisher domainEventPublisher;
-
-  @Autowired
-  private EntityManager entityManager;
 
   public DomainEventHandlers domainEventHandlers() {
     return DomainEventHandlersBuilder
@@ -41,11 +44,20 @@ public class OrderEventConsumer {
 
     OrderCreatedEvent orderCreatedEvent = domainEventEnvelope.getEvent();
 
-    Customer customer = customerRepository
-            .findById(orderCreatedEvent.getOrderDetails().getCustomerId())
-            .orElseThrow(() -> new IllegalArgumentException("Customer does not exist"));
+    Long customerId = orderCreatedEvent.getOrderDetails().getCustomerId();
 
-    entityManager.lock(customer, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+    Optional<Customer> possibleCustomer = customerRepository.findById(customerId);
+
+    if (!possibleCustomer.isPresent()) {
+      logger.info("Non-existent customer: {}", customerId);
+      domainEventPublisher.publish(Customer.class,
+              customerId,
+              Collections.singletonList(new CustomerValidationFailedEvent(orderId)));
+      return;
+    }
+
+    Customer customer = possibleCustomer.get();
+
 
     try {
       customer.reserveCredit(orderId, orderCreatedEvent.getOrderDetails().getOrderTotal());

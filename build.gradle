@@ -2,14 +2,50 @@ buildscript {
     repositories {
         mavenCentral()
         maven { url "https://repo.spring.io/milestone" }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
+        classpath "com.avast.gradle:gradle-docker-compose-plugin:0.9.1"
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.0'
+apply plugin: VerifyDockerHostIp
+apply plugin: 'docker-compose'
+apply plugin: WaitForMySqlPlugin
+
+
+dockerCompose {
+    tcpPortsToIgnoreWhenWaiting = [2888, 3888]
+    projectName = new File(".").getCanonicalFile().getName()
+    removeOrphans = true
+
+    if (project.hasProperty("microservices"))
+        startedServices=microservices.split(",")
+
+    databases {
+        startedServices= ['zookeeper', 'mysql', 'redis']
+        projectName = new File(".").getCanonicalFile().getName()
+    }
+
+    infrastructure {
+        startedServices= ['cdc-service']
+        projectName = new File(".").getCanonicalFile().getName()
+    }
+
+}
+
+databasesComposeUp.finalizedBy(waitForMySql)
+infrastructureComposeUp.dependsOn(databasesComposeUp)
+composeUp.dependsOn(infrastructureComposeUp)
+
+subprojects.each {
+    if (it.name.endsWith("-service")) {
+        composeUp.dependsOn("${it.name}:assemble")
+        composeBuild.dependsOn("${it.name}:assemble")
+    }
 }
 
 subprojects {
@@ -24,6 +60,11 @@ subprojects {
             url "https://dl.bintray.com/eventuateio-oss/eventuate-maven-release"
         }
         eventuateMavenRepoUrl.split(',').each { repoUrl -> maven { url repoUrl } }
+    }
+
+    // Deadlock on H2 shutdown - multiple shutdown hooks for appctx
+    test {
+        forkEvery 1
     }
 
 }

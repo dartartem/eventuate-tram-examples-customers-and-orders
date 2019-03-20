@@ -35,20 +35,14 @@ done
 ./gradlew testClasses
 
 if [ -z "USE_EXISTING" ] ; then
-    docker-compose -f docker-compose.yml down -v
+    ./gradlew composeDown
 fi
 
-docker-compose -f docker-compose.yml up -d --build zookeeper mysql redis
-
-./wait-for-mysql.sh
-
-docker-compose -f docker-compose.yml up -d --build cdc-service
-
-./wait-for-services.sh $DOCKER_HOST_IP "8099"
+./gradlew infrastructureComposeUp
 
 ./gradlew -x :end-to-end-tests:test build
 
-docker-compose -f docker-compose.yml up -d --build
+./gradlew composeUp
 
 ./wait-for-services.sh $DOCKER_HOST_IP "8081 8082 8083"
 
@@ -56,5 +50,5 @@ docker-compose -f docker-compose.yml up -d --build
 
 
 if [ -z "$KEEP_RUNNING" ] ; then
-    docker-compose -f docker-compose.yml down -v --remove-orphans
+    ./gradlew composeDown
 fi

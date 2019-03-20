@@ -1,6 +1,6 @@
 #! /bin/bash -e
 
-docker run $* \
+docker run $* -it \
    --name mysqlterm --rm \
    -e MYSQL_HOST=$DOCKER_HOST_IP \
    mysql:5.7.13 \
