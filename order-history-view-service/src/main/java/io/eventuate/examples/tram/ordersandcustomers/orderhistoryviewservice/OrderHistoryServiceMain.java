@@ -1,6 +1,6 @@
 package io.eventuate.examples.tram.ordersandcustomers.orderhistoryviewservice;
 
-import io.eventuate.examples.tram.ordersandcustomers.orderhistory.backend.OrderHistoryViewBackendRedisConfiguration;
+import io.eventuate.examples.tram.ordersandcustomers.orderhistoryviewservice.backend.OrderHistoryViewBackendRedisConfiguration;
 import io.eventuate.examples.tram.ordersandcustomers.orderhistoryviewservice.web.OrderHistoryViewWebConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
