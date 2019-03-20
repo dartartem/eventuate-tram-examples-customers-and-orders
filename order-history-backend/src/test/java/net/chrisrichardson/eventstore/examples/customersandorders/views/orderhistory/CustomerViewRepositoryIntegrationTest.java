@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class CustomerViewRepositoryIntegrationTest {
 
+  private final OrderInfo orderInfo1 = new OrderInfo(30L, new Money(30));
   @Autowired
   private CustomerViewRepository customerViewRepository;
 
@@ -49,7 +50,7 @@ public class CustomerViewRepositoryIntegrationTest {
             20L, new OrderInfo(20L, new Money(20)));
     createOrUpdateCustomerWithOrders(customerId, originalOrders);
 
-    Map<Long, OrderInfo> addedOrders = ImmutableMap.of(30L, new OrderInfo(30L, new Money(30)));
+    Map<Long, OrderInfo> addedOrders = ImmutableMap.of(30L, orderInfo1);
     createOrUpdateCustomerWithOrders(customerId, addedOrders);
 
     Map<Long, OrderInfo> mergedOrders = new HashMap<>();
@@ -63,7 +64,7 @@ public class CustomerViewRepositoryIntegrationTest {
   public void testOrderCreatedIfDoesNotExistWhenMerging() {
     Long customerId = System.nanoTime();
 
-    Map<Long, OrderInfo> addedOrders = ImmutableMap.of(30L, new OrderInfo(30L, new Money(30)));
+    Map<Long, OrderInfo> addedOrders = ImmutableMap.of(30L, orderInfo1);
     createOrUpdateCustomerWithOrders(customerId, addedOrders);
 
     assertOrdersAreMerged(customerId, addedOrders);

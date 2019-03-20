@@ -47,14 +47,9 @@ services:
     ports:
       - "8083:8080"
     depends_on:
-      - mysql
       - redis
       - zipkin
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql/eventuate
-      SPRING_DATASOURCE_USERNAME: mysqluser
-      SPRING_DATASOURCE_PASSWORD: mysqlpw
-      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.jdbc.Driver
       REDIS_SERVERS: redis:6379
       REDIS_PARTITIONS: 2
       SPRING_PROFILES_ACTIVE: Redis
