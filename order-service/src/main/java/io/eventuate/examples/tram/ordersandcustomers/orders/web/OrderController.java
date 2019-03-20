@@ -1,6 +1,6 @@
 package io.eventuate.examples.tram.ordersandcustomers.orders.web;
 
-import io.eventuate.examples.tram.ordersandcustomers.commondomain.OrderDetails;
+import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderDetails;
 import io.eventuate.examples.tram.ordersandcustomers.orders.domain.OrderRepository;
 import io.eventuate.examples.tram.ordersandcustomers.orders.service.OrderService;
 import io.eventuate.examples.tram.ordersandcustomers.orders.webapi.CreateOrderResponse;

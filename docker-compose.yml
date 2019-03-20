@@ -43,7 +43,7 @@ services:
       SPRING_ZIPKIN_BASE_URL: http://zipkin:9411/
 
   order-history-service:
-    build: ./order-history-view-service/
+    build: ./order-history-service/
     ports:
       - "8083:8080"
     depends_on:

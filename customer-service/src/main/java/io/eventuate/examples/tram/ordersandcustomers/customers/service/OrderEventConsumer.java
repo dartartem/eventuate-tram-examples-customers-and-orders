@@ -1,8 +1,8 @@
 package io.eventuate.examples.tram.ordersandcustomers.customers.service;
 
-import io.eventuate.examples.tram.ordersandcustomers.commondomain.CustomerCreditReservationFailedEvent;
-import io.eventuate.examples.tram.ordersandcustomers.commondomain.CustomerCreditReservedEvent;
-import io.eventuate.examples.tram.ordersandcustomers.commondomain.OrderCreatedEvent;
+import io.eventuate.examples.tram.ordersandcustomers.customerservice.domain.events.CustomerCreditReservationFailedEvent;
+import io.eventuate.examples.tram.ordersandcustomers.customerservice.domain.events.CustomerCreditReservedEvent;
+import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderCreatedEvent;
 import io.eventuate.examples.tram.ordersandcustomers.customers.domain.Customer;
 import io.eventuate.examples.tram.ordersandcustomers.customers.domain.CustomerCreditLimitExceededException;
 import io.eventuate.examples.tram.ordersandcustomers.customers.domain.CustomerRepository;
@@ -51,7 +51,7 @@ public class OrderEventConsumer {
       customer.reserveCredit(orderId, orderCreatedEvent.getOrderDetails().getOrderTotal());
 
       CustomerCreditReservedEvent customerCreditReservedEvent =
-              new CustomerCreditReservedEvent(orderId, orderCreatedEvent.getOrderDetails());
+              new CustomerCreditReservedEvent(orderId);
 
       domainEventPublisher.publish(Customer.class,
               customer.getId(),
@@ -60,7 +60,7 @@ public class OrderEventConsumer {
     } catch (CustomerCreditLimitExceededException e) {
 
       CustomerCreditReservationFailedEvent customerCreditReservationFailedEvent =
-              new CustomerCreditReservationFailedEvent(orderId, orderCreatedEvent.getOrderDetails());
+              new CustomerCreditReservationFailedEvent(orderId);
 
       domainEventPublisher.publish(Customer.class,
               customer.getId(),

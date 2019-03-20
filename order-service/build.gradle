@@ -3,9 +3,10 @@ apply plugin: FtgoServicePlugin
 dependencies {
     compile project(":common-swagger")
     compile project(":common")
-    compile project(":order-web-api")
+    compile project(":order-service-api-events")
+    compile project(":customer-service-api-events")
+    compile project(":order-service-api-web")
 
-    compile project(":common")
 
     compile "io.eventuate.tram.core:eventuate-tram-events:$eventuateTramVersion"
 
@@ -18,7 +19,7 @@ dependencies {
 
     compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
     compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
-    
+
 }
 
 

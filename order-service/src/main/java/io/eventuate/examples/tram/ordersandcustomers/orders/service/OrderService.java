@@ -1,8 +1,8 @@
 package io.eventuate.examples.tram.ordersandcustomers.orders.service;
 
-import io.eventuate.examples.tram.ordersandcustomers.commondomain.OrderApprovedEvent;
-import io.eventuate.examples.tram.ordersandcustomers.commondomain.OrderDetails;
-import io.eventuate.examples.tram.ordersandcustomers.commondomain.OrderRejectedEvent;
+import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderApprovedEvent;
+import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderDetails;
+import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderRejectedEvent;
 import io.eventuate.examples.tram.ordersandcustomers.orders.domain.Order;
 import io.eventuate.examples.tram.ordersandcustomers.orders.domain.OrderRepository;
 import io.eventuate.tram.events.ResultWithEvents;
