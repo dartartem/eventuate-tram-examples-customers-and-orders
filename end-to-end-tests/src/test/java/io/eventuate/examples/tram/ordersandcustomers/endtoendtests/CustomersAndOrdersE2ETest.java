@@ -9,18 +9,16 @@ import io.eventuate.examples.tram.ordersandcustomers.orders.webapi.CreateOrderRe
 import io.eventuate.examples.tram.ordersandcustomers.orders.webapi.GetOrderResponse;
 import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.CustomerView;
 import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.OrderView;
+import io.eventuate.util.test.async.Eventually;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.concurrent.TimeUnit;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = CustomersAndOrdersE2ETestConfiguration.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -45,121 +43,81 @@ public class CustomersAndOrdersE2ETest{
   RestTemplate restTemplate;
 
   @Test
-  public void shouldApprove() throws Exception {
-    CreateCustomerResponse createCustomerResponseResponse = restTemplate.postForObject(baseUrlCustomers("customers"),
-            new CreateCustomerRequest("Fred", new Money("15.00")), CreateCustomerResponse.class);
-
-    CreateOrderResponse createOrderResponse = restTemplate.postForObject(baseUrlOrders("orders"),
-            new CreateOrderRequest(createCustomerResponseResponse.getCustomerId(), new Money("12.34")), CreateOrderResponse.class);
-
-    assertOrderState(createOrderResponse.getOrderId(), OrderState.APPROVED);
+  public void shouldApprove() {
+    Long customerId = createCustomer("Fred", new Money("15.00"));
+    Long orderId = createOrder(customerId, new Money("12.34"));
+    assertOrderState(orderId, OrderState.APPROVED);
   }
 
   @Test
-  public void shouldReject() throws Exception {
-    CreateCustomerResponse createCustomerResponseResponse = restTemplate.postForObject(baseUrlCustomers("customers"),
-            new CreateCustomerRequest("Fred", new Money("15.00")), CreateCustomerResponse.class);
-
-    CreateOrderResponse createOrderResponse = restTemplate.postForObject(baseUrlOrders("orders"),
-            new CreateOrderRequest(createCustomerResponseResponse.getCustomerId(), new Money("123.40")), CreateOrderResponse.class);
-
-    assertOrderState(createOrderResponse.getOrderId(), OrderState.REJECTED);
+  public void shouldReject() {
+    Long customerId = createCustomer("Fred", new Money("15.00"));
+    Long orderId = createOrder(customerId, new Money("123.34"));
+    assertOrderState(orderId, OrderState.REJECTED);
   }
 
   @Test
-  public void shouldKeepHistory() throws Exception {
-    CreateCustomerResponse createCustomerResponseResponse = restTemplate.postForObject(baseUrlCustomers("customers"),
-            new CreateCustomerRequest("John", new Money("1000.00")), CreateCustomerResponse.class);
+  public void shouldRejectApproveAndKeepOrdersInHistory() {
+    Long customerId = createCustomer("John", new Money("1000"));
 
-    CreateOrderResponse approvedCreateOrderResponse = restTemplate.postForObject(baseUrlOrders("orders"),
-            new CreateOrderRequest(createCustomerResponseResponse.getCustomerId(), new Money("100")), CreateOrderResponse.class);
+    Long order1Id = createOrder(customerId, new Money("100"));
+    Long order2Id = createOrder(customerId, new Money("1000"));
 
-    Long approvedOrderId = approvedCreateOrderResponse.getOrderId();
+    String order1HistoryUrl = baseUrlOrderHistory("orders") + "/" + order1Id;
+    String order2HistoryUrl = baseUrlOrderHistory("orders") + "/" + order2Id;
+    String customerHistoryUrl = baseUrlOrderHistory("customers") + "/" + customerId;
 
-    CreateOrderResponse rejectedCreateOrdeResponse = restTemplate.postForObject(baseUrlOrders("orders"),
-            new CreateOrderRequest(createCustomerResponseResponse.getCustomerId(), new Money("1000")), CreateOrderResponse.class);
+    Eventually.eventually(() -> {
+      ResponseEntity<CustomerView> customerViewResponseEntity = restTemplate.getForEntity(customerHistoryUrl,
+              CustomerView.class);
 
-    Long rejectedOrderId = rejectedCreateOrdeResponse.getOrderId();
+      ResponseEntity<OrderView> orderView1ResponseEntity = restTemplate.getForEntity(order1HistoryUrl,
+              OrderView.class);
 
-    String approvedOrderHistoryUrl = baseUrlOrderHistory("orders") + "/" + approvedCreateOrderResponse.getOrderId();
-    String rejectedOrderHistoryUrl = baseUrlOrderHistory("orders") + "/" + rejectedCreateOrdeResponse.getOrderId();
-    String customerHistoryUrl = baseUrlOrderHistory("customers") + "/" + createCustomerResponseResponse.getCustomerId();
+      ResponseEntity<OrderView>  orderView2ResponseEntity = restTemplate.getForEntity(order2HistoryUrl,
+              OrderView.class);
 
-    ResponseEntity<CustomerView> customerViewResponseEntity = null;
-    ResponseEntity<OrderView> approvedOrderViewResponseEntity = null;
-    ResponseEntity<OrderView> rejectedOrderViewResponseEntity = null;
+      Assert.assertNotNull(customerViewResponseEntity);
+      Assert.assertNotNull(orderView1ResponseEntity);
+      Assert.assertNotNull(orderView2ResponseEntity);
 
-    OrderState approvedCustomerOrderState = null;
-    OrderState rejectedCustomerOrderState = null;
+      OrderState order1State = customerViewResponseEntity.getBody().getOrders().get(order1Id).getState();
+      OrderState order2State = customerViewResponseEntity.getBody().getOrders().get(order2Id).getState();
 
-    for (int i = 0; i < 100; i++) {
-      try {
-        customerViewResponseEntity = restTemplate.getForEntity(customerHistoryUrl,
-                CustomerView.class);
+      Assert.assertEquals(2, customerViewResponseEntity.getBody().getOrders().size());
+      assertOrderApprovedOrRejected(order1State);
+      assertOrderApprovedOrRejected(order2State);
+      Assert.assertNotEquals(order1State, order2State);
 
-        approvedOrderViewResponseEntity = restTemplate.getForEntity(approvedOrderHistoryUrl,
-                OrderView.class);
-
-        rejectedOrderViewResponseEntity = restTemplate.getForEntity(rejectedOrderHistoryUrl,
-                OrderView.class);
-
-        OrderState approvedOrderViewState = approvedOrderViewResponseEntity.getBody().getState();
-        OrderState rejectedOrderViewState = rejectedOrderViewResponseEntity.getBody().getState();
-
-        if (approvedOrderViewState == null || approvedOrderViewState == OrderState.PENDING ||
-                rejectedOrderViewState == null || rejectedOrderViewState == OrderState.PENDING ||
-                customerViewResponseEntity.getBody().getOrders().size() != 2) {
-
-          Thread.sleep(400);
-
-          continue;
-        }
-
-        approvedCustomerOrderState = customerViewResponseEntity.getBody().getOrders().get(approvedOrderId).getState();
-        rejectedCustomerOrderState = customerViewResponseEntity.getBody().getOrders().get(rejectedOrderId).getState();
-
-        if (approvedCustomerOrderState == null || approvedCustomerOrderState == OrderState.PENDING ||
-                rejectedCustomerOrderState == null || rejectedCustomerOrderState == OrderState.PENDING) {
-          Thread.sleep(400);
-          continue;
-        }
-
-        break;
-      } catch (Exception e) {
-        Thread.sleep(400);
-      }
-    }
-
-    Assert.assertNotNull(customerViewResponseEntity);
-    Assert.assertNotNull(approvedOrderViewResponseEntity);
-    Assert.assertNotNull(rejectedOrderViewResponseEntity);
-
-
-    Assert.assertTrue(customerViewResponseEntity.getStatusCode().is2xxSuccessful());
-    Assert.assertTrue(approvedOrderViewResponseEntity.getStatusCode().is2xxSuccessful());
-    Assert.assertTrue(rejectedOrderViewResponseEntity.getStatusCode().is2xxSuccessful());
-
-    Assert.assertEquals(2, customerViewResponseEntity.getBody().getOrders().size());
-    Assert.assertTrue(OrderState.APPROVED == approvedCustomerOrderState || approvedCustomerOrderState == OrderState.REJECTED);
-    Assert.assertTrue(OrderState.APPROVED == rejectedCustomerOrderState || rejectedCustomerOrderState == OrderState.REJECTED);
-    Assert.assertNotEquals(approvedCustomerOrderState, rejectedCustomerOrderState);
-
-    Assert.assertTrue(approvedOrderViewResponseEntity.getBody().getState() == OrderState.APPROVED || approvedOrderViewResponseEntity.getBody().getState() == OrderState.REJECTED);
-    Assert.assertTrue(rejectedOrderViewResponseEntity.getBody().getState() == OrderState.APPROVED || rejectedOrderViewResponseEntity.getBody().getState() == OrderState.REJECTED);
-    Assert.assertNotEquals(approvedOrderViewResponseEntity.getBody().getState(), rejectedOrderViewResponseEntity.getBody().getState());
+      assertOrderApprovedOrRejected(orderView1ResponseEntity.getBody().getState());
+      assertOrderApprovedOrRejected(orderView2ResponseEntity.getBody().getState());
+      Assert.assertNotEquals(orderView1ResponseEntity.getBody().getState(), orderView2ResponseEntity.getBody().getState());
+    });
   }
 
-  private void assertOrderState(Long id, OrderState expectedState) throws InterruptedException {
-    GetOrderResponse order = null;
-    for (int i = 0; i < 100; i++) {
-      ResponseEntity<GetOrderResponse> getOrderResponseEntity = restTemplate.getForEntity(baseUrlOrders("orders/" + id), GetOrderResponse.class);
-      Assert.assertEquals(HttpStatus.OK, getOrderResponseEntity.getStatusCode());
-      order = getOrderResponseEntity.getBody();
-      if (order.getOrderState() == expectedState)
-        break;
-      TimeUnit.MILLISECONDS.sleep(400);
-    }
 
-    Assert.assertEquals(expectedState, order.getOrderState());
+  private Long createCustomer(String name, Money credit) {
+    return restTemplate.postForObject(baseUrlCustomers("customers"),
+            new CreateCustomerRequest(name, credit), CreateCustomerResponse.class).getCustomerId();
+  }
+
+  private Long createOrder(Long customerId, Money orderTotal) {
+    return restTemplate.postForObject(baseUrlOrders("orders"),
+            new CreateOrderRequest(customerId, orderTotal), CreateOrderResponse.class).getOrderId();
+  }
+
+  private void assertOrderApprovedOrRejected(OrderState orderState) {
+    Assert.assertTrue(OrderState.APPROVED == orderState || orderState == OrderState.REJECTED);
+  }
+
+  private void assertOrderState(Long id, OrderState expectedState) {
+    Eventually.eventually(() -> {
+      ResponseEntity<GetOrderResponse> getOrderResponseEntity =
+              restTemplate.getForEntity(baseUrlOrders("orders/" + id), GetOrderResponse.class);
+
+      GetOrderResponse order = getOrderResponseEntity.getBody();
+
+      Assert.assertEquals(expectedState, order.getOrderState());
+    });
   }
 }
