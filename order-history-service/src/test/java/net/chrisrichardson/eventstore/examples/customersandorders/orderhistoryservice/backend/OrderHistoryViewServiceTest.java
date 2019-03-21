@@ -1,12 +1,12 @@
-package net.chrisrichardson.eventstore.examples.customersandorders.views.orderhistory;
+package net.chrisrichardson.eventstore.examples.customersandorders.orderhistoryservice.backend;
 
 import io.eventuate.examples.tram.ordersandcustomers.commondomain.Money;
-import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderState;
 import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.CustomerView;
 import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.OrderView;
-import io.eventuate.examples.tram.ordersandcustomers.orderhistoryviewservice.backend.CustomerViewRepository;
-import io.eventuate.examples.tram.ordersandcustomers.orderhistoryviewservice.backend.OrderHistoryViewService;
-import io.eventuate.examples.tram.ordersandcustomers.orderhistoryviewservice.backend.OrderViewRepository;
+import io.eventuate.examples.tram.ordersandcustomers.orderhistoryservice.persistence.CustomerViewRepository;
+import io.eventuate.examples.tram.ordersandcustomers.orderhistoryservice.persistence.OrderViewRepository;
+import io.eventuate.examples.tram.ordersandcustomers.orderhistoryservice.service.OrderHistoryViewService;
+import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderState;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

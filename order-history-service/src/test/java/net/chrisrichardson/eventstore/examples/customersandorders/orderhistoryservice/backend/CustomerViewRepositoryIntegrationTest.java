@@ -1,10 +1,11 @@
-package net.chrisrichardson.eventstore.examples.customersandorders.views.orderhistory;
+package net.chrisrichardson.eventstore.examples.customersandorders.orderhistoryservice.backend;
 
 import com.google.common.collect.ImmutableMap;
 import io.eventuate.examples.tram.ordersandcustomers.commondomain.Money;
 import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.CustomerView;
 import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.OrderInfo;
-import io.eventuate.examples.tram.ordersandcustomers.orderhistoryviewservice.backend.CustomerViewRepository;
+import io.eventuate.examples.tram.ordersandcustomers.orderhistoryservice.persistence.CustomerViewRepository;
+import io.eventuate.examples.tram.ordersandcustomers.orderhistoryservice.persistence.OrderHistoryServicePersistenceConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +19,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = OrderHistoryViewServiceTestConfiguration.class,
+@SpringBootTest(classes = OrderHistoryServicePersistenceConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class CustomerViewRepositoryIntegrationTest {
 

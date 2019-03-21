@@ -1,6 +1,7 @@
-package io.eventuate.examples.tram.ordersandcustomers.orderhistoryviewservice.backend;
+package io.eventuate.examples.tram.ordersandcustomers.orderhistoryservice.messaging;
 
 import io.eventuate.examples.tram.ordersandcustomers.customerservice.domain.events.CustomerCreatedEvent;
+import io.eventuate.examples.tram.ordersandcustomers.orderhistoryservice.service.OrderHistoryViewService;
 import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderApprovedEvent;
 import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderCreatedEvent;
 import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderRejectedEvent;

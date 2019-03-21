@@ -1,7 +1,7 @@
-package io.eventuate.examples.tram.ordersandcustomers.orderhistoryviewservice.web.orders;
+package io.eventuate.examples.tram.ordersandcustomers.orderhistoryservice.web.orders;
 
-import io.eventuate.examples.tram.ordersandcustomers.orderhistoryviewservice.backend.OrderViewRepository;
 import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.OrderView;
+import io.eventuate.examples.tram.ordersandcustomers.orderhistoryservice.persistence.OrderViewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
