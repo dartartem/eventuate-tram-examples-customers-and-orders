@@ -1,7 +1,7 @@
 package io.eventuate.examples.tram.ordersandcustomers.orders;
 
-import io.eventuate.examples.tram.ordersandcustomers.orders.service.OrderServiceEventSubscriber;
 import io.eventuate.examples.tram.ordersandcustomers.orders.service.OrderService;
+import io.eventuate.examples.tram.ordersandcustomers.orders.service.OrderServiceEventSubscriber;
 import io.eventuate.tram.events.publisher.TramEventsPublisherConfiguration;
 import io.eventuate.tram.events.subscriber.DomainEventDispatcher;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;

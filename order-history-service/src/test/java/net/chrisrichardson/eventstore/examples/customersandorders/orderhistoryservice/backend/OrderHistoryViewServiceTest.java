@@ -2,9 +2,7 @@ package net.chrisrichardson.eventstore.examples.customersandorders.orderhistorys
 
 import io.eventuate.examples.tram.ordersandcustomers.commondomain.Money;
 import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.CustomerView;
-import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.OrderView;
 import io.eventuate.examples.tram.ordersandcustomers.orderhistoryservice.persistence.CustomerViewRepository;
-import io.eventuate.examples.tram.ordersandcustomers.orderhistoryservice.persistence.OrderViewRepository;
 import io.eventuate.examples.tram.ordersandcustomers.orderhistoryservice.service.OrderHistoryViewService;
 import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderState;
 import org.junit.Test;
@@ -26,8 +24,6 @@ public class OrderHistoryViewServiceTest {
   @Autowired
   private CustomerViewRepository customerViewRepository;
 
-  @Autowired
-  private OrderViewRepository orderViewRepository;
 
   @Test
   public void shouldCreateCustomerAndOrdersEtc() {
@@ -60,13 +56,6 @@ public class OrderHistoryViewServiceTest {
     assertEquals(orderTotal2, customerView.getOrders().get(orderId2).getOrderTotal());
     assertEquals(OrderState.REJECTED, customerView.getOrders().get(orderId2).getState());
 
-    OrderView orderView1 = orderViewRepository.findById(orderId1).get();
-    assertEquals(orderTotal1, orderView1.getOrderTotal());
-    assertEquals(OrderState.APPROVED, orderView1.getState());
-
-    OrderView orderView2 = orderViewRepository.findById(orderId2).get();
-    assertEquals(orderTotal2, orderView2.getOrderTotal());
-    assertEquals(OrderState.REJECTED, orderView2.getState());
   }
 
 

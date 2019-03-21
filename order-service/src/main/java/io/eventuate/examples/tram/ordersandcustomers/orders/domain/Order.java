@@ -1,7 +1,6 @@
 package io.eventuate.examples.tram.ordersandcustomers.orders.domain;
 
 
-import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderCreatedEvent;
 import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderDetails;
 import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderState;
 

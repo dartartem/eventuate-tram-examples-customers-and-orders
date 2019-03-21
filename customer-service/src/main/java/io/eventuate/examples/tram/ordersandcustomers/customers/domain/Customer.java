@@ -1,7 +1,7 @@
 package io.eventuate.examples.tram.ordersandcustomers.customers.domain;
 
-import io.eventuate.examples.tram.ordersandcustomers.customerservice.domain.events.CustomerCreatedEvent;
 import io.eventuate.examples.tram.ordersandcustomers.commondomain.Money;
+import io.eventuate.examples.tram.ordersandcustomers.customerservice.domain.events.CustomerCreatedEvent;
 import io.eventuate.tram.events.ResultWithEvents;
 import org.hibernate.annotations.DynamicUpdate;
 

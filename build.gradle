@@ -71,7 +71,7 @@ subprojects {
 
 
 task buildAndTestAll(type: GradleBuild) {
-    def t = ["testClasses"]
+    List<String> t = ["testClasses"]
 
     if (!(project.hasProperty("buildAndTestAllUseExisting") && buildAndTestAllUseExisting))
         t.add("composeDown")

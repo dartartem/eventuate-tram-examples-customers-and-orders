@@ -1,6 +1,8 @@
 package io.eventuate.examples.tram.ordersandcustomers.customers.service;
 
-import io.eventuate.tram.consumer.common.*;
+import io.eventuate.tram.consumer.common.MessageHandlerDecorator;
+import io.eventuate.tram.consumer.common.MessageHandlerDecoratorChain;
+import io.eventuate.tram.consumer.common.SubscriberIdAndMessage;
 import org.springframework.core.Ordered;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;

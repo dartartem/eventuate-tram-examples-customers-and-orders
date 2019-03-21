@@ -3,12 +3,11 @@ package io.eventuate.examples.tram.ordersandcustomers.endtoendtests;
 import io.eventuate.examples.tram.ordersandcustomers.commondomain.Money;
 import io.eventuate.examples.tram.ordersandcustomers.customers.webapi.CreateCustomerRequest;
 import io.eventuate.examples.tram.ordersandcustomers.customers.webapi.CreateCustomerResponse;
-import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderState;
+import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.CustomerView;
 import io.eventuate.examples.tram.ordersandcustomers.orders.webapi.CreateOrderRequest;
 import io.eventuate.examples.tram.ordersandcustomers.orders.webapi.CreateOrderResponse;
 import io.eventuate.examples.tram.ordersandcustomers.orders.webapi.GetOrderResponse;
-import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.CustomerView;
-import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.OrderView;
+import io.eventuate.examples.tram.ordersandcustomers.orderservice.domain.events.OrderState;
 import io.eventuate.util.test.async.Eventually;
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,6 +18,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
+
+import static org.hamcrest.Matchers.isIn;
+import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = CustomersAndOrdersEndToEndTestConfiguration.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -70,23 +74,14 @@ public class CustomersAndOrdersEndToEndTest{
     Long order1Id = createOrder(customerId, new Money("100"));
     Long order2Id = createOrder(customerId, new Money("1000"));
 
-    String order1HistoryUrl = baseUrlOrderHistory("orders") + "/" + order1Id;
-    String order2HistoryUrl = baseUrlOrderHistory("orders") + "/" + order2Id;
     String customerHistoryUrl = baseUrlOrderHistory("customers") + "/" + customerId;
 
     Eventually.eventually(() -> {
       ResponseEntity<CustomerView> customerViewResponseEntity = restTemplate.getForEntity(customerHistoryUrl,
               CustomerView.class);
 
-      ResponseEntity<OrderView> orderView1ResponseEntity = restTemplate.getForEntity(order1HistoryUrl,
-              OrderView.class);
-
-      ResponseEntity<OrderView>  orderView2ResponseEntity = restTemplate.getForEntity(order2HistoryUrl,
-              OrderView.class);
 
       Assert.assertNotNull(customerViewResponseEntity);
-      Assert.assertNotNull(orderView1ResponseEntity);
-      Assert.assertNotNull(orderView2ResponseEntity);
 
       OrderState order1State = customerViewResponseEntity.getBody().getOrders().get(order1Id).getState();
       OrderState order2State = customerViewResponseEntity.getBody().getOrders().get(order2Id).getState();
@@ -95,10 +90,6 @@ public class CustomersAndOrdersEndToEndTest{
       assertOrderApprovedOrRejected(order1State);
       assertOrderApprovedOrRejected(order2State);
       Assert.assertNotEquals(order1State, order2State);
-
-      assertOrderApprovedOrRejected(orderView1ResponseEntity.getBody().getState());
-      assertOrderApprovedOrRejected(orderView2ResponseEntity.getBody().getState());
-      Assert.assertNotEquals(orderView1ResponseEntity.getBody().getState(), orderView2ResponseEntity.getBody().getState());
     });
   }
 
@@ -114,7 +105,7 @@ public class CustomersAndOrdersEndToEndTest{
   }
 
   private void assertOrderApprovedOrRejected(OrderState orderState) {
-    Assert.assertTrue(OrderState.APPROVED == orderState || orderState == OrderState.REJECTED);
+    assertThat(orderState, isIn(Arrays.asList(OrderState.APPROVED, OrderState.REJECTED)));
   }
 
   private void assertOrderState(Long id, OrderState expectedState) {
