@@ -4,7 +4,6 @@ set -e
 
 KEEP_RUNNING=
 ASSEMBLE_ONLY=
-SKIP_EUREKA_TESTS=
 USE_EXISTING=
 
 while [ ! -z "$*" ] ; do
@@ -15,14 +14,8 @@ while [ ! -z "$*" ] ; do
     "--use-existing" )
       USE_EXISTING=yes
       ;;
-    "--assemble-only" )
-      ASSEMBLE_ONLY=yes
-      ;;
-    "--skip-eureka-tests" )
-      SKIP_EUREKA_TESTS=yes
-      ;;
     "--help" )
-      echo ./build-and-test-all.sh --keep-running --assemble-only --skip-eureka-tests
+      echo ./build-and-test-all.sh --keep-running --assemble-only
       exit 0
       ;;
   esac

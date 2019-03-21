@@ -6,7 +6,6 @@ class VerifyDockerHostIp implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        println  System.getenv("DOCKER_HOST_IP")
       project.task('verifyDockerHostIp', type:Exec) {
         workingDir project.projectDir
         commandLine 'docker', 'run', '-p', '8889:8888', '-e', 'DOCKER_DIAGNOSTICS_PORT=8889', '-e', "DOCKER_HOST_IP=" + System.getenv("DOCKER_HOST_IP"),

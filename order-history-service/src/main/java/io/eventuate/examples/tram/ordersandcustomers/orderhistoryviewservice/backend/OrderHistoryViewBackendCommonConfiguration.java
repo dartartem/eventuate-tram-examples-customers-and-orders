@@ -11,28 +11,16 @@ import org.springframework.context.annotation.Import;
 public class OrderHistoryViewBackendCommonConfiguration {
 
   @Bean
-  public OrderHistoryEventConsumer orderEventConsumer() {
-    return new OrderHistoryEventConsumer();
-  }
-
-  @Bean("orderHistoryDomainEventDispatcher")
-  public DomainEventDispatcher orderHistoryDomainEventDispatcher(OrderHistoryEventConsumer orderHistoryEventConsumer,
-                                                                 MessageConsumer messageConsumer) {
-
-    return new DomainEventDispatcher("orderHistoryServiceEvents",
-            orderHistoryEventConsumer.domainEventHandlers(), messageConsumer);
+  public OrderHistoryServiceEventSubscriber orderEventConsumer() {
+    return new OrderHistoryServiceEventSubscriber();
   }
 
   @Bean
-  public CustomerHistoryEventConsumer customerHistoryEventConsumer() {
-    return new CustomerHistoryEventConsumer();
+  public DomainEventDispatcher orderHistoryServiceEventDispatcher(OrderHistoryServiceEventSubscriber orderHistoryServiceEventSubscriber,
+                                                                       MessageConsumer messageConsumer) {
+
+    return new DomainEventDispatcher("orderHistoryServiceEvents",
+            orderHistoryServiceEventSubscriber.domainEventHandlers(), messageConsumer);
   }
 
-  @Bean("customerHistoryDomainEventDispatcher")
-  public DomainEventDispatcher customerHistoryDomainEventDispatcher(CustomerHistoryEventConsumer customerHistoryEventConsumer,
-                                                                    MessageConsumer messageConsumer) {
-
-    return new DomainEventDispatcher("customerHistoryServiceEvents",
-            customerHistoryEventConsumer.domainEventHandlers(), messageConsumer);
-  }
 }
