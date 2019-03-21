@@ -1,6 +1,5 @@
 package net.chrisrichardson.eventstore.examples.customersandorders.orderhistoryservice.backend;
 
-import com.google.common.collect.ImmutableMap;
 import io.eventuate.examples.tram.ordersandcustomers.commondomain.Money;
 import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.CustomerView;
 import io.eventuate.examples.tram.ordersandcustomers.orderhistory.common.OrderInfo;
@@ -13,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,63 +22,80 @@ import static org.junit.Assert.assertEquals;
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class CustomerViewRepositoryIntegrationTest {
 
-  private final OrderInfo orderInfo1 = new OrderInfo(30L, new Money(30));
   @Autowired
   private CustomerViewRepository customerViewRepository;
+
+  private final Money creditLimit = new Money(2000);
+  private final String customerName = "Fred";
+  private final List<OrderInfo> originalOrders = Arrays.asList(new OrderInfo(10L, new Money(10)),
+          new OrderInfo(20L, new Money(20)));
+  private final OrderInfo orderInfo1 = new OrderInfo(30L, new Money(30));
 
   @Test
   public void shouldCreateAndFindCustomer() {
 
-    Long customerId = System.nanoTime();
-    Money creditLimit = new Money(2000);
-    String customerName = "Fred";
+    CustomerView customer = makeCustomer();
 
-    customerViewRepository.createOrUpdateCustomerView(new CustomerView(customerId, customerName, creditLimit));
-    CustomerView customerView = customerViewRepository.findById(customerId).get();
+    customerViewRepository.createOrUpdateCustomerView(customer);
 
-    assertEquals(customerId, customerView.getId());
-    assertEquals(customerName, customerView.getName());
-    assertEquals(0, customerView.getOrders().size());
-    assertEquals(creditLimit, customerView.getCreditLimit());
+    assertCustomerHasOrders(customer, Collections.emptyList());
   }
 
   @Test
   public void testOrderMerging() {
-    Long customerId = System.nanoTime();
 
-    Map<Long, OrderInfo> originalOrders = ImmutableMap.of(10L, new OrderInfo(10L, new Money(10)),
-            20L, new OrderInfo(20L, new Money(20)));
-    createOrUpdateCustomerWithOrders(customerId, originalOrders);
+    CustomerView customer = createOrUpdateCustomerWithOrders(originalOrders);
+    Long customerId = customer.getId();
 
-    Map<Long, OrderInfo> addedOrders = ImmutableMap.of(30L, orderInfo1);
-    createOrUpdateCustomerWithOrders(customerId, addedOrders);
+    List<OrderInfo> addedOrders = Collections.singletonList(orderInfo1);
+    addOrders(customerId, addedOrders);
 
-    Map<Long, OrderInfo> mergedOrders = new HashMap<>();
-    mergedOrders.putAll(originalOrders);
-    mergedOrders.putAll(addedOrders);
+    List<OrderInfo> mergedOrders = new LinkedList<>();
+    mergedOrders.addAll(originalOrders);
+    mergedOrders.addAll(addedOrders);
 
-    assertOrdersAreMerged(customerId, mergedOrders);
+    assertCustomerHasOrders(customer, mergedOrders);
+
+    // Test duplicate event
+  }
+
+  @Test
+  public void testDuplicateCustomerCreatedEvent() {
+    CustomerView customer = createOrUpdateCustomerWithOrders(Collections.emptyList());
+    addOrders(customer.getId(), originalOrders);
+    customerViewRepository.createOrUpdateCustomerView(customer);
+    assertCustomerHasOrders(customer, originalOrders);
   }
 
   @Test
   public void testOrderCreatedIfDoesNotExistWhenMerging() {
-    Long customerId = System.nanoTime();
 
-    Map<Long, OrderInfo> addedOrders = ImmutableMap.of(30L, orderInfo1);
-    createOrUpdateCustomerWithOrders(customerId, addedOrders);
+    List<OrderInfo> addedOrders = Collections.singletonList(orderInfo1);
+    CustomerView customer = createOrUpdateCustomerWithOrders(addedOrders);
 
-    assertOrdersAreMerged(customerId, addedOrders);
+    assertCustomerHasOrders(customer, addedOrders);
   }
 
-  private void createOrUpdateCustomerWithOrders(Long customerId, Map<Long, OrderInfo> orders) {
-    CustomerView customerView = new CustomerView();
-    customerView.setId(customerId);
+  private CustomerView makeCustomer() {
+    return new CustomerView(System.nanoTime(), customerName, creditLimit);
+  }
+
+  private CustomerView createOrUpdateCustomerWithOrders(List<OrderInfo> orders) {
+    CustomerView customerView = makeCustomer();
     customerView.addOrders(orders);
     customerViewRepository.createOrUpdateCustomerView(customerView);
+    return customerView;
   }
 
-  private void assertOrdersAreMerged(Long customerId, Map<Long, OrderInfo> mergedOrders) {
-    CustomerView customerView = customerViewRepository.findById(customerId).get();
-    Assert.assertEquals(customerView.getOrders(), mergedOrders);
+  private void addOrders(long customerId, Collection<OrderInfo> orders) {
+    orders.forEach((order) -> customerViewRepository.addOrder(customerId, order));
+  }
+
+  private void assertCustomerHasOrders(CustomerView expected, List<OrderInfo> expectedOrders) {
+    CustomerView customerView = customerViewRepository.findById(expected.getId()).get();
+    Assert.assertEquals(expectedOrders.stream().collect(Collectors.toMap(OrderInfo::getOrderId, (x) -> x)), customerView.getOrders());
+    assertEquals(expected.getId(), customerView.getId());
+    assertEquals(expected.getName(), customerView.getName());
+    assertEquals(expected.getCreditLimit(), customerView.getCreditLimit());
   }
 }

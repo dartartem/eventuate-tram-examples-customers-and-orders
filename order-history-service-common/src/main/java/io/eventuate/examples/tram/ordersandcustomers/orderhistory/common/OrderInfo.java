@@ -23,9 +23,6 @@ public class OrderInfo {
     this.state = state;
   }
 
-  public Long getOrderId() {
-    return orderId;
-  }
 
   public OrderInfo(Long orderId, Money orderTotal) {
     this.orderId = orderId;
@@ -33,8 +30,19 @@ public class OrderInfo {
     this.state = OrderState.PENDING;
   }
 
+  public Long getOrderId() {
+    return orderId;
+  }
   public Money getOrderTotal() {
     return orderTotal;
+  }
+
+  public void setOrderId(Long orderId) {
+    this.orderId = orderId;
+  }
+
+  public void setOrderTotal(Money orderTotal) {
+    this.orderTotal = orderTotal;
   }
 
   public OrderState getState() {

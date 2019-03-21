@@ -27,11 +27,11 @@ public class CustomersAndOrdersEndToEndTest{
   @Value("#{systemEnvironment['DOCKER_HOST_IP']}")
   private String hostName = "localhost";
 
-  private String baseUrlOrders(String path) {
+  private String baseUrlCustomers(String path) {
     return "http://"+hostName+":8081/" + path;
   }
 
-  private String baseUrlCustomers(String path) {
+  private String baseUrlOrders(String path) {
     return "http://"+hostName+":8082/" + path;
   }
 

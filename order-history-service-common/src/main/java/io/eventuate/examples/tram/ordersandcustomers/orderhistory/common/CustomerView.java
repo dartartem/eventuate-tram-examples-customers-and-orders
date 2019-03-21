@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RedisHash
@@ -48,6 +49,9 @@ public class CustomerView {
 
   public void addOrders(Map<Long, OrderInfo> orders) {
     this.orders.putAll(orders);
+  }
+  public void addOrders(List<OrderInfo> orders) {
+    orders.forEach(order -> this.orders.put(order.getOrderId(), order));
   }
 
   public void setName(String name) {

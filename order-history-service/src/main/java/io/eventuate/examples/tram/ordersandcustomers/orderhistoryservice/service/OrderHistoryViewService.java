@@ -25,9 +25,7 @@ public class OrderHistoryViewService {
   }
 
   public void addOrder(Long customerId, Long orderId, Money orderTotal) {
-    CustomerView customerView = new CustomerView(customerId);
-    customerView.addOrder(new OrderInfo(orderId, orderTotal));
-    customerViewRepository.createOrUpdateCustomerView(customerView);
+    customerViewRepository.addOrder(customerId, new OrderInfo(orderId, orderTotal));
 
     orderViewRepository.createOrUpdateOrderView(new OrderView(orderId, orderTotal));
   }
@@ -41,9 +39,7 @@ public class OrderHistoryViewService {
   }
 
   private void changeOrderState(Long customerId, Long orderId, OrderState state) {
-    CustomerView customerView = new CustomerView(customerId);
-    customerView.addOrder(new OrderInfo(orderId, state));
-    customerViewRepository.createOrUpdateCustomerView(customerView);
+    customerViewRepository.updateState(customerId, orderId, state);
 
     OrderView orderView = new OrderView(orderId);
     orderView.setState(state);
