@@ -2,20 +2,18 @@
 
 set -e
 
-KEEP_RUNNING=
-ASSEMBLE_ONLY=
-USE_EXISTING=
+GRADLE_OPTIONS=
 
 while [ ! -z "$*" ] ; do
   case $1 in
-    "--keep-running" )
-      KEEP_RUNNING=yes
-      ;;
     "--use-existing" )
-      USE_EXISTING=yes
+      GRADLE_OPTIONS="$GRADLE_OPTIONS -P buildAndTestAllUseExisting=true"
+      ;;
+    "--keep-running" )
+      GRADLE_OPTIONS="$GRADLE_OPTIONS -P buildAndTestAllKeepRunning=true"
       ;;
     "--help" )
-      echo ./build-and-test-all.sh --keep-running --assemble-only
+      echo ./build-and-test-all.sh --use-existing --keep-running
       exit 0
       ;;
   esac
@@ -25,23 +23,6 @@ done
 
 . ./set-env-mysql.sh
 
-./gradlew testClasses
-
-if [ -z "USE_EXISTING" ] ; then
-    ./gradlew composeDown
-fi
-
-./gradlew infrastructureComposeUp
-
-./gradlew -x :end-to-end-tests:test build
-
-./gradlew composeUp
-
-./wait-for-services.sh $DOCKER_HOST_IP "8081 8082 8083"
-
-./gradlew :end-to-end-tests:cleanTest :end-to-end-tests:test
+./gradlew $GRADLE_OPTIONS buildAndTestAll
 
 
-if [ -z "$KEEP_RUNNING" ] ; then
-    ./gradlew composeDown
-fi
